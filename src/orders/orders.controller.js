@@ -7,3 +7,33 @@ const orders = require(path.resolve("src/data/orders-data"));
 const nextId = require("../utils/nextId");
 
 // TODO: Implement the /orders handlers needed to make the tests pass
+
+//////////////////////////////
+
+// EXISTS
+
+// HASTEXT
+
+//////////////////////////////
+
+// CREATE
+
+// READ
+
+// UPDATE
+
+// DELETE
+
+// LIST
+
+
+//////////////////////////////
+
+module.exports = {
+  create: [hasText, create],
+  read: [orderExists, read],
+  update: [orderExists, hasText, update],
+  delete: [orderExists, destroy],
+  list: [list],
+  orderExists,
+};
