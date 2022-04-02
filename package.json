@@ -4,7 +4,7 @@
   "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Thinkful-Ed/web-dev-programs",
+    "url": "hhttps://github.com/rdburdett/grubdash-backend",
     "directory": "/library/zid-be-robust-server-structure-XX-assignment/solution"
   },
   "main": "src/server.js",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "jest": "^26.4.2",
-     "nodemon": "^2.0.4",
+    "nodemon": "^2.0.4",
     "supertest": "^5.0.0"
   }
 }
