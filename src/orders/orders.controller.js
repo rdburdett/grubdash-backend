@@ -9,8 +9,18 @@ const nextId = require("../utils/nextId");
 //////////////////////////////
 
 // EXISTS
+// * working
 function orderExists(req, res, next) {
-  res.sendStatus(404)
+  const { orderId } = req.params
+  const foundOrder = orders.find((order) => order.id = Number(orderId))
+  if (foundOrder) {
+    res.locals.order = foundOrder;
+    return next();
+  }
+  next({
+    status: 404,
+    message: `Order id not found: ${req.params.useId}`,
+  });
 }
 
 // HASTEXT
@@ -22,12 +32,13 @@ function hasText(req, res, next) {
 
 // CREATE
 function create(req, res, next) {
+  
   res.sendStatus(404)
 }
 
 // READ
 function read(req, res, next) {
-  res.sendStatus(404)
+  res.json({ data: res.locals.order });
 }
 
 // UPDATE
@@ -42,8 +53,9 @@ function destroy(req, res, next) {
 }
 
 // LIST
+// * working
 function list(req, res, next) {
-  res.sendStatus(404)
+  res.json({ data: orders });
 }
 
 
