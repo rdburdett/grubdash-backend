@@ -77,6 +77,7 @@ function read(req, res, next) {
 
 // UPDATE
 // (Do not allow dish id to be overwritten)
+// * working
 function update(req, res, next) {
   const { data } = req.body;
   const dishId = Number(req.params.dishId)
