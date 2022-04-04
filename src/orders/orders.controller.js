@@ -53,7 +53,6 @@ function isValid(req, res, next) {
   }
 
   if (missingFieldsMessage.length > 0) {
-    console.log(input.dishes);
     next({
       status: 400,
       message: missingFieldsMessage.join(", "),
