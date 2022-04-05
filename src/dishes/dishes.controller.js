@@ -26,24 +26,24 @@ function dishExists(req, res, next) {
 // ISVALID
 // * working
 function isValid(req, res, next) {
-  input = req.body.data;
+  const { data } = req.body;
   let missingFieldsMessage = [];
 
-  if (!input.name || input.name.length === 0) {
+  if (!data.name || data.name.length === 0) {
     missingFieldsMessage.push("Dish must include a name");
   }
-  if (!input.description || input.description.length === 0) {
+  if (!data.description || data.description.length === 0) {
     missingFieldsMessage.push("Dish must include a description");
   }
-  if (!input.price) {
+  if (!data.price) {
     missingFieldsMessage.push("Dish must include a price");
   }
-  if (input.price <= 0 || !Number.isInteger(input.price)) {
+  if (data.price <= 0 || !Number.isInteger(data.price)) {
     missingFieldsMessage.push(
       "Dish must have a price that is an integer greater than 0"
     );
   }
-  if (!input.image_url || input.image_url.length === 0) {
+  if (!data.image_url || data.image_url.length === 0) {
     missingFieldsMessage.push("Dish must include an image_url");
   }
 
@@ -80,20 +80,20 @@ function read(req, res, next) {
 // * working
 function update(req, res, next) {
   const { data } = req.body;
-  const dishId = Number(req.params.dishId)
-  const foundDish = dishes.find((dish) => dish.id === dishId);
-  if ((data.id) && dishId !== Number(data.id)) {
+  const dishId = Number(req.params.dishId);
+  const foundDish = res.locals.dish;
+  if (data.id && dishId !== Number(data.id)) {
     next({
       status: 400,
-      message: `Dish id does not match route id. Dish: ${data.id}, Route: ${dishId}`
-    })
+      message: `Dish id does not match route id. Dish: ${data.id}, Route: ${dishId}`,
+    });
   }
-    foundDish.id = data.id
-    foundDish.name = data.name
-    foundDish.description = data.description
-    foundDish.price = data.price
-    foundDish.image_url = data.image_url
-    res.json({ data: foundDish })
+  foundDish.id = foundDish.id.toString();
+  foundDish.name = data.name;
+  foundDish.description = data.description;
+  foundDish.price = data.price;
+  foundDish.image_url = data.image_url;
+  res.json({ data: foundDish });
 }
 
 // * NO DELETE *

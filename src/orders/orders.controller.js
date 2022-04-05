@@ -27,24 +27,24 @@ function orderExists(req, res, next) {
 // ISVALID
 // * working
 function isValid(req, res, next) {
-  input = req.body.data;
+  const { data } = req.body;
   let missingFieldsMessage = [];
 
-  if (!input.deliverTo || input.deliverTo.length === 0) {
+  if (!data.deliverTo || data.deliverTo.length === 0) {
     missingFieldsMessage.push("Dish must include a deliverTo");
   }
-  if (!input.mobileNumber || input.mobileNumber.length === 0) {
+  if (!data.mobileNumber || data.mobileNumber.length === 0) {
     missingFieldsMessage.push("Dish must include a mobileNumber");
   }
-  if (!input.dishes) {
+  if (!data.dishes) {
     missingFieldsMessage.push("Dish must include a dish");
   }
 
-  if (input.dishes) {
-    if (input.dishes.length === 0 || !Array.isArray(input.dishes)) {
+  if (data.dishes) {
+    if (data.dishes.length === 0 || !Array.isArray(data.dishes)) {
       missingFieldsMessage.push("Order must include at least one dish");
     } else {
-      input.dishes.forEach((dish, index) => {
+      data.dishes.forEach((dish, index) => {
         if (dish.quantity <= 0 || !Number.isInteger(dish.quantity)) {
           missingFieldsMessage.push(
             `Dish ${index} must have a quantity that is an integer greater than 0`
@@ -65,7 +65,9 @@ function isValid(req, res, next) {
 function isStatusValid(req, res, next) {
   const { data: { status } = {} } = req.body;
 
-  if (status !== ("pending" || "preparing" || "out-for-delivery" || "delivered")) {
+  if (
+    status !== ("pending" || "preparing" || "out-for-delivery" || "delivered")
+  ) {
     next({
       status: 400,
       message:
@@ -114,7 +116,7 @@ function update(req, res, next) {
     });
   }
 
-  foundOrder.id = orderId.toString();
+  foundOrder.id = foundOrder.id.toString();
   foundOrder.deliverTo = data.deliverTo;
   foundOrder.mobileNumber = data.mobileNumber;
   foundOrder.dishes = data.dishes;
@@ -132,12 +134,10 @@ function destroy(req, res, next) {
     res.sendStatus(204);
   } else {
     next({
-    status: 400,
-    message: "An order cannot be deleted unless it is pending.",
-  });
+      status: 400,
+      message: "An order cannot be deleted unless it is pending.",
+    });
   }
-
-  
 }
 
 // LIST
