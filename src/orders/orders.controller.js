@@ -1,3 +1,4 @@
+const { stat } = require("fs");
 const path = require("path");
 
 // Use the existing order data
@@ -19,11 +20,12 @@ function orderExists(req, res, next) {
   }
   next({
     status: 404,
-    message: `Order id not found: ${req.params.useId}`,
+    message: `Order id not found: ${req.params.orderId}`,
   });
 }
 
-// HASTEXT
+// ISVALID
+// * working
 function isValid(req, res, next) {
   input = req.body.data;
   let missingFieldsMessage = [];
@@ -60,9 +62,28 @@ function isValid(req, res, next) {
   } else next();
 }
 
+function isStatusValid(req, res, next) {
+  const { data: { status } = {} } = req.body;
+
+  if (status !== ("pending" || "preparing" || "out-for-delivery" || "delivered")) {
+    next({
+      status: 400,
+      message:
+        "Order must have a status of pending, preparing, out-for-delivery, delivered.",
+    });
+  } else if (status === "delivered") {
+    return next({
+      status: 400,
+      message: "A delivered order cannot be changed.",
+    });
+  }
+  next();
+}
+
 //////////////////////////////
 
 // CREATE
+// * working
 function create(req, res, next) {
   const { data } = req.body;
   const newOrder = {
@@ -74,6 +95,7 @@ function create(req, res, next) {
 }
 
 // READ
+// * working
 function read(req, res, next) {
   res.json({ data: res.locals.order });
 }
@@ -81,12 +103,41 @@ function read(req, res, next) {
 // UPDATE
 // (Do not allow order id to be overwritten)
 function update(req, res, next) {
-  res.sendStatus(404);
+  const { data } = req.body;
+  const orderId = Number(req.params.orderId);
+  const foundOrder = res.locals.order;
+
+  if (data.id && orderId !== Number(data.id)) {
+    next({
+      status: 400,
+      message: `Order id does not match route id. Order: ${data.id}, Route: ${orderId}`,
+    });
+  }
+
+  foundOrder.id = orderId.toString();
+  foundOrder.deliverTo = data.deliverTo;
+  foundOrder.mobileNumber = data.mobileNumber;
+  foundOrder.dishes = data.dishes;
+  res.json({ data: foundOrder });
 }
 
 // DELETE
 function destroy(req, res, next) {
-  res.sendStatus(404);
+  const orderId = req.params.orderId;
+  const foundOrder = res.locals.order;
+  const index = orders.find((order) => order.id === Number(orderId));
+
+  if (foundOrder.status === "pending") {
+    orders.splice(index, 1);
+    res.sendStatus(204);
+  } else {
+    next({
+    status: 400,
+    message: "An order cannot be deleted unless it is pending.",
+  });
+  }
+
+  
 }
 
 // LIST
@@ -100,7 +151,7 @@ function list(req, res, next) {
 module.exports = {
   create: [isValid, create],
   read: [orderExists, read],
-  update: [orderExists, isValid, update],
+  update: [orderExists, isValid, isStatusValid, update],
   delete: [orderExists, destroy],
   list: [list],
   orderExists,
